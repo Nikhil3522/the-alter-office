@@ -48,17 +48,26 @@ function InfiniteScrollPosts() {
     >
       <div className="posts">
         {posts.map(post => (
-          <div key={post.id} className="post">
-            <h3>{post.content}</h3>
-            {post.images &&
-              post.images.map((url, index) => (
-                <img key={index} src={url} alt={`Post ${post.id}`} />
-              ))}
-            <p>User ID: {post.user_id}</p>
-            <p>
-              Timestamp:{' '}
-              {new Date(post.timestamp.seconds * 1000).toLocaleString()}
-            </p>
+          <div key={post.id} className="post my-2 p-3 rounded-[20px]">
+            <div className='creator-info flex gap-x-[10px]'>
+              <img className="w-[40px] h-[40px] object-cover rounded-full"
+                src="https://ca-times.brightspotcdn.com/dims4/default/48ac18e/2147483647/strip/true/crop/4718x3604+0+0/resize/1200x917!/format/webp/quality/75/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Ffd%2F21%2F3491434e446c83711360a43f6978%2Fla-photos-1staff-471763-en-ana-de-armas-mjc-09.jpg" />
+              <div>
+                <p>Nikhil</p>
+                <p className='text-[10px] text-gray-500'>2 Hours ago</p>
+              </div>
+            </div>
+            <h3 className='my-3'>{post.content}</h3>
+            <div className='post-image-container'>
+              {post.assets &&
+                post.assets.map((url, index) => (
+                  <img key={index} src={url} alt={`Post ${post.id}`} />
+                ))}
+            </div>
+            <div className='mt-2 flex justify-between'>
+              <button>67</button>
+              <button className='bg-[#0000001A] h-[32px] w-[92px] rounded-[30px] font-bold'>Share</button>
+            </div>
           </div>
         ))}
       </div>
