@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* styles.css */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #000; /* Change to #fff for white background */
+}
+
+.container {
+  max-width: 600px; /* Adjust as needed for desktop width */
+  margin: 0 auto;
+  background-color: #fff; /* Content background */
+  min-height: 100vh; /* Full height view */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional shadow for content */
+}
+
+.edit-profile{
+  border: 1px solid;
+    height: 32px;
+    width: 100%;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    position: relative;
+    bottom: 0;
+}
