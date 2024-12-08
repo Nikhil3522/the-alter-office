@@ -34,7 +34,9 @@ function Home() {
     <div className={`container p-4 ${sharePostId ? 'opacity-50' : ''}`}>
       {userData &&
       <div className='flex' onClick={() => navigate('/profile')}>
-        <img class="w-[50px] h-[50px] object-cover rounded-full" src={userData.profile}/>
+        <img class="w-[50px] h-[50px] object-cover rounded-full" 
+        src={userData.profile}
+        />
         <div className='ml-3 mt-1'>
           <p className='text-[12.4px] text-gray-500'>Welcome Back,</p>
           <h4>{userData.name}</h4>
