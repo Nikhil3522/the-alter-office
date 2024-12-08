@@ -12,7 +12,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background-color: #000; /* Change to #fff for white background */
 }
 
 .container {
@@ -20,7 +19,6 @@ body {
   margin: 0 auto;
   background-color: #fff; /* Content background */
   min-height: 100vh; /* Full height view */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional shadow for content */
 }
 
 .edit-profile{
@@ -41,4 +39,65 @@ input, textarea{
   padding-left: 5px;
   padding-right: 5px;
   font-weight: bold;
+}
+
+.post:nth-child(even){
+  background: #FFFAEE;
+}
+
+.post:nth-child(odd){
+  background: #F7EBFF;
+}
+
+.post-image-container{
+  display: flex;
+  column-gap: 10px;
+  overflow-x: scroll;
+}
+
+.post-image-container img{
+  border-radius: 12px;
+}
+
+
+.row {
+  display: -ms-flexbox; /* IE10 */
+  display: flex;
+  -ms-flex-wrap: wrap; /* IE10 */
+  flex-wrap: wrap;
+}
+
+/* Create four equal columns that sits next to each other */
+.column {
+  -ms-flex: 33%; /* IE10 */
+  flex: 33%;
+  max-width: 33%;
+  padding: 0 4px;
+  margin-top: -8px;
+}
+.column:nth-child(1){
+  padding-left: 0;
+}
+.column:nth-child(2){
+  margin-top: -50px;
+}
+.column:nth-child(3){
+  padding-right: 0;
+}
+.column img {
+  margin-top: 8px;
+  vertical-align: middle;
+  width: 100%;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px; /* Optional space between items */
+}
+.grid-item {
+  background-color: #ddd;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #ccc;
 }
