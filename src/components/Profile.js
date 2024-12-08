@@ -1,65 +1,224 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import backIcon from '../assets/icons/back.png';
 import ProfileInfo from './ProfileInfo';
-import EditProfileInfo from './EditProfileInfo';
 import EditIcon from '../assets/icons/edit.png';
+import plus from '../assets/icons/plus.png';
+import { getFirestore, doc, updateDoc } from 'firebase/firestore';
+import { firebaseApp } from '../firebase.utils'; // Ensure you have your Firebase config set up
+import { useNavigate } from 'react-router-dom';
+import MyPosts from './MyPosts';
 
-function Profile(){
+function Profile() {
     const [step, setStep] = useState(1);
+    const [userData, setUserData] = useState(null);
+    const navigate = useNavigate();
+    const db = getFirestore(firebaseApp);
+
+    const updateProfileDataPost = async () => {
+
+        try {
+            const userRef = doc(db, 'users', userData.id); // 'users' is the collection, 'userId' is the document ID
+
+            // Update the document with new data
+            await updateDoc(userRef, userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+            setStep(1);
+        } catch (error) {
+            console.error('Error updating document:', error);
+        }
+    }
+
+    const getUserData = async () => {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        setUserData(storedUser);
+    };
+
+    useEffect(() => {
+        getUserData();
+    }, [])
+
+
+
+    const handleFileChange = async (e) => {
+        const files = Array.from(e.target.files); // Convert FileList to Array
+        const uploadedFileNames = [];
+
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append('mediaFile', file);
+
+            try {
+                const response = await fetch('http://51.68.207.190/testing_d/nikhil/the-alter-office/index.php', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    uploadedFileNames.push(data.file_name); // Add file name to array
+                } else {
+                    console.error(`Failed to upload ${file.name}: ${data.message}`);
+                }
+            } catch (error) {
+                console.error(`Error uploading ${file.name}:`, error);
+            }
+        }
+
+        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFileNames));
+        navigate('/new-post')
+    };
+
+    const coverFileEdit = async (type, e) => {
+
+        const file = e.target.files[0];
+
+
+        const formData = new FormData();
+        formData.append('mediaFile', file);
+
+        try {
+            const response = await fetch('http://51.68.207.190/testing_d/nikhil/the-alter-office/index.php', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                if(type === "profile"){
+                    setUserData({...userData, profile : process.env.REACT_APP_IMAGE_PREFIX+data.file_name})
+                }else{
+                    setUserData({...userData, cover : data.file_name})
+                }
+            } else {
+                console.error(`Failed to upload ${file.name}: ${data.message}`);
+            }
+        } catch (error) {
+            console.error(`Error uploading ${file.name}:`, error);
+        }
+        
+    }
+
+
 
     const backBtnFunction = () => {
-        if(step === 2){
+        if (step === 2) {
             setStep(1);
             return;
         }
+
+        navigate('/');
     }
-    return(
-        <div className="container relative">
-            <div>
-                <div className='absolute flex mt-[25px] ml-[16px]'>
-                    <button onClick={backBtnFunction}><img className="w-[32px] " src={backIcon}/></button>
+    return (
+        userData && (
+            <div className="container relative">
+                <div>
+                    <div className='absolute flex mt-[25px] ml-[16px]'>
+                        <button onClick={backBtnFunction}><img className="w-[32px] " src={backIcon} /></button>
+                        {step === 2 &&
+                            <p className='text-[20px] font-semibold text-white ml-[15px]'>Edit Profile</p>
+                        }
+                    </div>
+                    <img
+                        className="max-h-[189px] w-full object-cover rounded-b-[20px]"
+                        src={`${process.env.REACT_APP_IMAGE_PREFIX}${userData.cover}`}
+                    />
+                    
+                    {/* cover image edit icon */}
                     {step === 2 &&
-                    <p className='text-[20px] font-semibold text-white ml-[15px]'>Edit Profile</p>
+                        <>
+                            <input
+                                type="file"
+                                id="cover-image-upload"
+                                className="hidden"
+                                multiple
+                                onChange={(event) => coverFileEdit('cover', event)}
+                            />
+                            <label htmlFor="cover-image-upload">
+                                <img
+                                    className="w-[25px] bg-[#c2c2c2] absolute right-[13px] -mt-[36px] p-[5px] rounded-[15px] z-10"
+                                    src={EditIcon}
+                                    alt="edit"
+                                />
+                            </label>
+                        </>}
+                </div>
+                <div className='flex relative px-4 -mt-[60px] space-between justify-between'>
+                    <img
+                        className="h-[112px] w-[112px] object-cover rounded-full"
+                        src={userData.profile}
+                    />
+                    {/* profile image edit icon */}
+                    {step === 2 &&
+                        
+                        <>
+                        <input
+                            type="file"
+                            id="profile-image-upload"
+                            className="hidden"
+                            multiple
+                            onChange={(event) => coverFileEdit('profile', event)}
+                        />
+                        <label htmlFor="profile-image-upload">
+                            <img
+                                className="w-[25px] bg-[#c2c2c2] absolute p-[5px] mt-[70px] ml-[-20px] rounded-[15px] z-10"
+                                src={EditIcon}
+                                alt="edit"
+                            />
+                        </label>
+                    </>}
+                    {step === 1 &&
+                        <button onClick={() => setStep(2)} className='edit-profile mt-[auto]'>Edit Profile</button>
                     }
                 </div>
-                <img 
-                    class="max-h-[189px] w-full object-cover rounded-b-[20px]"
-                    src="https://plus.unsplash.com/premium_photo-1671987552220-973918c6f3dc?q=80&w=1906&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                />
-                {/* cover image edit icon */}
-                {step === 2 &&
-                <img
-                    className="w-[25px] bg-[#c2c2c2] absolute right-[13px] -mt-[36px] p-[5px] rounded-[15px]"
-                    src={EditIcon}
-                />}
-            </div>
-            <div className='flex relative px-4 -mt-[60px]'>
-                <img 
-                    class="h-[112px] w-[112px] object-cover rounded-full" 
-                    src="https://ca-times.brightspotcdn.com/dims4/default/48ac18e/2147483647/strip/true/crop/4718x3604+0+0/resize/1200x917!/format/webp/quality/75/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Ffd%2F21%2F3491434e446c83711360a43f6978%2Fla-photos-1staff-471763-en-ana-de-armas-mjc-09.jpg"
-                />
-                {/* profile image edit icon */}
-                {step === 2 &&
-                <img
-                    className="w-[25px] bg-[#c2c2c2] absolute mt-[73px] ml-[90px] p-[5px] rounded-[15px]"
-                    src={EditIcon}
-                />}
-                {step === 1 &&
-                <button onClick={() => setStep(2)} className='edit-profile mt-[auto]'>Edit Profile</button>
+
+                {step === 1 ? 
+                    <>
+                        <ProfileInfo name={userData.name} bio={userData.bio} />
+                        <MyPosts userData={userData}/>
+                    </>
+                    :
+                    <>
+                        <div className="p-4">
+                            <label>Name</label>
+                            <br></br>
+                            <input onChange={e => setUserData({ ...userData, name: e.target.value })} value={userData.name} type="text" />
+                            <label >Bio</label>
+                            <br></br>
+                            <textarea onChange={e => setUserData({ ...userData, bio: e.target.value })} value={userData.bio} type="text" />
+                        </div>
+                    </>}
+
+                {step === 2 ?
+                    <div className='w-full absolute bottom-[40px] px-4'>
+                        <button onClick={updateProfileDataPost} className="w-full bg-black text-white h-[48px] rounded-[36px]">SAVE</button>
+                    </div> :
+                    (
+                        <>
+                            {/* Hidden file input */}
+                            <input
+                                type="file"
+                                id="file-upload"
+                                className="hidden"
+                                multiple
+                                onChange={handleFileChange}
+                            />
+
+                            {/* Image as label */}
+                            <label htmlFor="file-upload">
+                                <img
+                                    className="bg-black p-[9px] rounded-full fixed bottom-[40px] right-[25px] cursor-pointer"
+                                    src={plus}
+                                    alt="Upload"
+                                />
+                            </label>
+                        </>
+                    )
                 }
+
+
             </div>
-            {step === 1 ? <ProfileInfo /> : <EditProfileInfo />}
-
-            {step === 2 &&
-                <div className='w-full absolute bottom-[40px] px-4'>
-                    <button className="w-full bg-black text-white h-[48px] rounded-[36px]">SAVE</button>
-                </div>
-            }
-
-        </div>
+        )
     )
 }
 
 export default Profile;
-
-
