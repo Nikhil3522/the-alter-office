@@ -7,15 +7,17 @@ import { getFirestore, doc, updateDoc } from 'firebase/firestore';
 import { firebaseApp } from '../firebase.utils'; // Ensure you have your Firebase config set up
 import { useNavigate } from 'react-router-dom';
 import MyPosts from './MyPosts';
+import LoaderComp from './LoaderComp';
 
 function Profile() {
     const [step, setStep] = useState(1);
     const [userData, setUserData] = useState(null);
+    const [loader, setLoader] = useState(false);
     const navigate = useNavigate();
     const db = getFirestore(firebaseApp);
 
     const updateProfileDataPost = async () => {
-
+        setLoader(true);
         try {
             const userRef = doc(db, 'users', userData.id); // 'users' is the collection, 'userId' is the document ID
 
@@ -26,6 +28,7 @@ function Profile() {
         } catch (error) {
             console.error('Error updating document:', error);
         }
+        setLoader(false);
     }
 
     const getUserData = async () => {
@@ -40,6 +43,7 @@ function Profile() {
 
 
     const handleFileChange = async (e) => {
+        setLoader(true);
         const files = Array.from(e.target.files); // Convert FileList to Array
         const uploadedFileNames = [];
         const maxSize = 1 * 1024 * 1024; // 1 MB in bytes
@@ -72,10 +76,12 @@ function Profile() {
         }
 
         localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFileNames));
+        setLoader(false);
         navigate('/new-post')
     };
 
     const coverFileEdit = async (type, e) => {
+        setLoader(true);
 
         const file = e.target.files[0];
         const maxSize = 1 * 1024 * 1024; // 1 MB in bytes
@@ -107,7 +113,7 @@ function Profile() {
         } catch (error) {
             console.error(`Error uploading ${file.name}:`, error);
         }
-        
+        setLoader(false);
     }
 
 
@@ -226,7 +232,7 @@ function Profile() {
                         </>
                     )
                 }
-
+                {loader && <LoaderComp />}
 
             </div>
         )
