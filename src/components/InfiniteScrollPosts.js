@@ -1,12 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { collection, query, orderBy, limit, startAfter, getDocs, getDoc, doc } from 'firebase/firestore';
 import { firestore } from '../firebase.utils'; // Adjust to your Firebase config file
 import InfiniteScroll from 'react-infinite-scroll-component';
+import heart from '../assets/icons/heart.png';
+import share from '../assets/icons/share.png';
+import LoaderComp from './LoaderComp';
 
-function InfiniteScrollPosts() {
+function InfiniteScrollPosts(props) {
   const [posts, setPosts] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
   const [hasMore, setHasMore] = useState(true);
+  const videoRefs = useRef([]);
+
+  // auto pause video code
+  useEffect(() => {
+    const options = {
+      root: null, // Use the viewport as the root
+      rootMargin: '0px',
+      threshold: 0.5, // Trigger when 50% of the video is visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          video.play(); // Play video when in view
+        } else {
+          video.pause(); // Pause video when out of view
+        }
+      });
+    }, options);
+
+    videoRefs.current.forEach((video) => {
+      if (video) {
+        observer.observe(video);
+      }
+    });
+
+    return () => {
+      videoRefs.current.forEach((video) => {
+        if (video) {
+          observer.unobserve(video);
+        }
+      });
+    };
+  }, []);
 
   useEffect(() => {
     console.log("posts", posts);
@@ -83,7 +121,7 @@ function InfiniteScrollPosts() {
       dataLength={posts.length} // Number of items already loaded
       next={() => fetchPosts(false)} // Function to load more items
       hasMore={hasMore} // Boolean to show loader or end message
-      loader={<h4>Loading...</h4>}
+      loader={<h1>...</h1>}
       endMessage={<p style={{ textAlign: 'center' }}>You have seen it all!</p>}
     >
       <div className="posts">
@@ -100,13 +138,39 @@ function InfiniteScrollPosts() {
             <h3 className='my-3'>{post.content}</h3>
             <div className='post-image-container'>
               {post.assets &&
-                post.assets.map((url, index) => (
-                  <img key={index} src={process.env.REACT_APP_IMAGE_PREFIX+url} alt={`Post ${post.id}`} />
-                ))}
+                post.assets.map((url, index) => {
+                  const isVideo = /\.(mp4|webm|ogg)$/i.test(url); // Check for common video file extensions
+                  
+                  return isVideo ? (
+                    <video
+                      key={index}
+                      ref={(el) => (videoRefs.current[index] = el)}
+                      className='object-cover'
+                      controls
+                      autoPlay
+                      muted // Add this if you want the video to be muted by default
+                      src={`${process.env.REACT_APP_IMAGE_PREFIX}${url}`}
+                      alt={`Post ${post.id}`}
+                    />
+                  ) : (
+                    <img
+                      key={index}
+                      className='object-cover'
+                      src={`${process.env.REACT_APP_IMAGE_PREFIX}${url}`}
+                      alt={`Post ${post.id}`}
+                    />
+                  );
+                })}
             </div>
             <div className='mt-2 flex justify-between'>
-              <button>67</button>
-              <button className='bg-[#0000001A] h-[32px] w-[92px] rounded-[30px] font-bold'>Share</button>
+              <button className='flex gap-1 text-red-500 font-semibold mt-1'>
+                <img className='w-[20px] mt-[2px]' src={heart}/> 67
+              </button>
+              <button 
+                onClick={() => props.sharePost(post.id)}
+                className='bg-[#0000001A] h-[32px] w-[92px] rounded-[30px] font-bold flex justify-center items-center'>
+                <img className='w-[17px]' src={share}/>Share
+              </button>
             </div>
           </div>
         ))}
