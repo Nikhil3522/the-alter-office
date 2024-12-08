@@ -42,8 +42,15 @@ function Profile() {
     const handleFileChange = async (e) => {
         const files = Array.from(e.target.files); // Convert FileList to Array
         const uploadedFileNames = [];
+        const maxSize = 1 * 1024 * 1024; // 1 MB in bytes
 
         for (const file of files) {
+            // Check if the file size exceeds 1 MB
+            if (file.size > maxSize) {
+                alert(`The file "${file.name}" exceeds 1 MB. Select a file with a maximum size of 1 MB.`);
+                return; // Stop processing further files
+            }
+            
             const formData = new FormData();
             formData.append('mediaFile', file);
 
@@ -71,7 +78,12 @@ function Profile() {
     const coverFileEdit = async (type, e) => {
 
         const file = e.target.files[0];
+        const maxSize = 1 * 1024 * 1024; // 1 MB in bytes
 
+        if (file.size > maxSize) {
+            alert(`The file "${file.name}" exceeds 1 MB. Select a file with a maximum size of 1 MB.`);
+            return; // Stop processing further files
+        }
 
         const formData = new FormData();
         formData.append('mediaFile', file);
@@ -128,9 +140,9 @@ function Profile() {
                         <>
                             <input
                                 type="file"
+                                accept="image/*"
                                 id="cover-image-upload"
                                 className="hidden"
-                                multiple
                                 onChange={(event) => coverFileEdit('cover', event)}
                             />
                             <label htmlFor="cover-image-upload">
@@ -153,14 +165,14 @@ function Profile() {
                         <>
                         <input
                             type="file"
+                            accept="image/*"
                             id="profile-image-upload"
                             className="hidden"
-                            multiple
                             onChange={(event) => coverFileEdit('profile', event)}
                         />
                         <label htmlFor="profile-image-upload">
                             <img
-                                className="w-[25px] bg-[#c2c2c2] absolute p-[5px] mt-[70px] ml-[-20px] rounded-[15px] z-10"
+                                className="w-[25px] bg-[#c2c2c2] absolute p-[5px] mt-[70px] rounded-[15px] left-[105px] z-10"
                                 src={EditIcon}
                                 alt="edit"
                             />
