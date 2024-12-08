@@ -46,12 +46,13 @@ function Profile() {
         setLoader(true);
         const files = Array.from(e.target.files); // Convert FileList to Array
         const uploadedFileNames = [];
-        const maxSize = 1 * 1024 * 1024; // 1 MB in bytes
+        const maxSize = 1.1 * 1024 * 1024; // 1 MB in bytes
 
         for (const file of files) {
             // Check if the file size exceeds 1 MB
-            if (file.size > maxSize) {
+            if (file.size >= maxSize) {
                 alert(`The file "${file.name}" exceeds 1 MB. Select a file with a maximum size of 1 MB.`);
+                setLoader(false);
                 return; // Stop processing further files
             }
             
@@ -84,10 +85,11 @@ function Profile() {
         setLoader(true);
 
         const file = e.target.files[0];
-        const maxSize = 1 * 1024 * 1024; // 1 MB in bytes
+        const maxSize = 1.1 * 1024 * 1024; // 1 MB in bytes
 
-        if (file.size > maxSize) {
+        if (file.size >= maxSize) {
             alert(`The file "${file.name}" exceeds 1 MB. Select a file with a maximum size of 1 MB.`);
+            setLoader(false);
             return; // Stop processing further files
         }
 
