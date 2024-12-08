@@ -1,9 +1,11 @@
 import InfiniteScrollPosts from './InfiniteScrollPosts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SharePost from './SharePost';
 
 function Home() {
   const [userData, setUserData] = useState(null);
+  const [sharePostId, setSharePostId] = useState(null);
   const navigate = useNavigate();
 
   const getUserData = async () => {
@@ -11,12 +13,25 @@ function Home() {
     setUserData(storedUser);
   };
 
+  const sharePost = (postId) => {
+    setSharePostId(postId);
+  }
+
   useEffect(() => {
     getUserData();
   }, [])
 
+  useEffect(() => {
+    if (sharePostId) {
+      document.body.style.overflow = 'hidden'; // Disable scrolling
+    } else {
+      document.body.style.overflow = 'auto'; // Enable scrolling
+    }
+  }, [sharePostId]);
+
   return (
-    <div className="container p-4">
+    <>
+    <div className={`container p-4 ${sharePostId ? 'opacity-50' : ''}`}>
       {userData &&
       <div className='flex' onClick={() => navigate('/profile')}>
         <img class="w-[50px] h-[50px] object-cover rounded-full" src={userData.profile}/>
@@ -27,11 +42,13 @@ function Home() {
       </div>}
 
       <h1 className='font-extrabold text-[24px] leading-[28.06px] mt-6 mb-4'>Feeds</h1>
-
       <div>
-        <InfiniteScrollPosts />
+        <InfiniteScrollPosts sharePost={sharePost}/>
       </div>
     </div>
+    {sharePostId && <SharePost sharePost={sharePost}/>
+      }
+    </>
   );
 }
 
