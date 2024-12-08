@@ -60,7 +60,7 @@ function Profile() {
             formData.append('mediaFile', file);
 
             try {
-                const response = await fetch('http://51.68.207.190/testing_d/nikhil/the-alter-office/index.php', {
+                const response = await fetch('https://51.68.207.190/testing_d/nikhil/the-alter-office/index.php', {
                     method: 'POST',
                     body: formData,
                 });
@@ -97,7 +97,7 @@ function Profile() {
         formData.append('mediaFile', file);
 
         try {
-            const response = await fetch('http://51.68.207.190/testing_d/nikhil/the-alter-office/index.php', {
+            const response = await fetch('https://51.68.207.190/testing_d/nikhil/the-alter-office/index.php', {
                 method: 'POST',
                 body: formData,
             });
